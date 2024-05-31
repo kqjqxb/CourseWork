@@ -1,13 +1,15 @@
+// Клас для роботи з точками
 class ActionWithPoints
 {
     constructor() {
-        this.filePointsCache = [];
+        this.filePointsCache = [];// Масив для точок, завантажених з файлу
     }
 
+    // Оновлює форму з точками, змінюючи id та name полів відповідно до їхнього порядкового номера
     updatePointsForm() {
         const pointsForm = document.getElementById('pointsForm');
         const numPoints = pointsForm.children.length;
-    
+
         for (let i = 1; i <= numPoints; i++) {
             const xInput = document.getElementById(`x${i}`);
             const yInput = document.getElementById(`y${i}`);
@@ -17,8 +19,8 @@ class ActionWithPoints
             yInput.id = `y${i}`;
         }
     }
-
-     validateInput(input, minValue, maxValue) {
+    // Валідація для вводу значень - перевірка чи значення є числом та чи входить воно у  діапазон
+    validateInput(input, minValue, maxValue) {
         const value = input.value;
         const isValid = /^-?\d*\.?\d*$/.test(value);
         if (!isValid) {
@@ -31,16 +33,16 @@ class ActionWithPoints
             }
         }
     }
-    
-     addPoint() {
+    // Додає нову точку до форми
+    addPoint() {
         const pointsForm = document.getElementById('pointsForm');
         const numPoints = pointsForm.children.length + 1;
-    
+
         if (numPoints > 15) {
             alert('Кількість точок повинна бути від 2 до 15.');
             return;
         }
-    
+
         const point = `
             <div id="point${numPoints}">
                 <label for="x${numPoints}">X${numPoints}: </label>
@@ -50,12 +52,12 @@ class ActionWithPoints
                 <button type="button" id="remove" class="btn btn-danger" onclick="awp.removePoint(${numPoints})">Видалити</button>
             </div>
         `;
-    
+
         pointsForm.insertAdjacentHTML('beforeend', point);
         document.getElementById('numPoints').value = numPoints;
     }
-    
-    
+
+    // Видаляє точку з форми та оновлює індексацію точок
     removePoint(index) {
         const point = document.getElementById(`point${index}`);
         if (point) {
@@ -65,9 +67,9 @@ class ActionWithPoints
             document.getElementById('numPoints').value = document.getElementById('pointsForm').children.length;
         }
     }
-    
-    
-     reIndexPoints() {
+
+    // Перевпорядковує індекси точок у формі після видалення точки
+    reIndexPoints() {
         const pointsForm = document.getElementById('pointsForm');
         const children = pointsForm.children;
         for (let i = 0; i < children.length; i++) {
@@ -83,8 +85,8 @@ class ActionWithPoints
             point.querySelector('button').setAttribute('onclick', `awp.removePoint(${id})`);
         }
     }
-    
-     generatePoints() {
+    // Генерує випадкові точки та додає їх до форми
+    generatePoints() {
         const numPoints = document.getElementById('numPoints').value;
         if (numPoints < 2 || numPoints > 15) {
             alert('Кількість точок повинна бути від 2 до 15.');
@@ -92,7 +94,7 @@ class ActionWithPoints
         }
         const pointsForm = document.getElementById('pointsForm');
         pointsForm.innerHTML = '';
-    
+
         for (let i = 1; i <= numPoints; i++) {
             const x = Math.floor(Math.random() * 3001) - 1500;
             const y = Math.floor(Math.random() * 3001) - 1500;
@@ -107,7 +109,7 @@ class ActionWithPoints
             `;
         }
     }
-
+    //Перевіряє дублікати точок
     checkDuplicatePoints(points) {
         const duplicates = [];
         for (let i = 0; i < points.length - 1; i++) {
@@ -119,7 +121,7 @@ class ActionWithPoints
         }
         return duplicates;
     }
-
+    // Встановлює до форми точки з файлу
     setFilePoints(points) {
         if (points.length < 2 || points.length > 15) {
             alert('Кількість точок повинна бути від 2 до 15.');
@@ -127,7 +129,7 @@ class ActionWithPoints
         }
         const pointsForm = document.getElementById('pointsForm');
         pointsForm.innerHTML = '';
-    
+
         points.forEach((point, index) => {
             pointsForm.innerHTML += `
                 <div id="point${index + 1}">
@@ -141,13 +143,13 @@ class ActionWithPoints
         });
         document.getElementById('numPoints').value = points.length;
     }
-
+    // Сортує точки за значенням координати x
     sortPoints(points) {
         return points.sort((a, b) => a.x - b.x);
     }
 
 
-
+    //Зчитує файл та записує точки до полів
     readFile(input) {
         const file = input.files[0];
         const reader = new FileReader();
@@ -158,18 +160,18 @@ class ActionWithPoints
                 const [x, y] = line.split(/\s+/).map(Number);
                 return { x, y };
             });
-    
+
             if (points.length < 2 || points.length > 15) {
                 alert('Кількість точок повинна бути від 2 до 15.');
                 return;
             }
-    
+
             this.filePointsCache = points;
             this.setFilePoints(points); // Виклик функції для відображення точок у формі
         };
         reader.readAsText(file);
     }
-    
+
 
     setFilePoints(points) {
         const pointsForm = document.getElementById('pointsForm');
@@ -188,14 +190,15 @@ class ActionWithPoints
         });
     }
 
-
+    // Повертає кешовані точки з файлу
     getFilePoints() {
         return this.filePointsCache;
     }
 }
-
+//Клас для роботи з інтерфейсом
 class UI
 {
+    //Створює поля для точок
     createFields() {
         const numPoints = document.getElementById('numPoints').value;
         if (numPoints < 2 || numPoints > 15) {
@@ -204,7 +207,7 @@ class UI
         }
         const pointsForm = document.getElementById('pointsForm');
         pointsForm.innerHTML = '';
-    
+
         for (let i = 1; i <= numPoints; i++) {
             pointsForm.innerHTML += `
                 <div id="point${i}">
@@ -217,12 +220,12 @@ class UI
             `;
         }
     }
-
+    //Переключає метод інтерполювання
     toggleInputMethod() {
         const method = document.getElementById('pointInputMethod').value;
         const manualInput = document.getElementById('manualInput');
         const fileInputDiv = document.getElementById('fileInputDiv');
-    
+
         if (method === 'manual') {
             manualInput.style.display = 'block';
             fileInputDiv.style.display = 'none';
@@ -233,14 +236,14 @@ class UI
             awp.setFilePoints(awp.getFilePoints());
         }
     }
-
+    // Скидує все після натискання на кнопку "Скинути"
     resetAll() {
         const pointsForm = document.getElementById('pointsForm');
         pointsForm.innerHTML = '';
         const numPoints = document.getElementById('numPoints');
         numPoints.value = '';
         document.getElementById('fileInput').value = ''; // Очищення поля файлу
-    
+
         const ctx = document.getElementById('interpolationChart').getContext('2d');
         if (window.chart) {
             window.chart.destroy();
@@ -250,21 +253,22 @@ class UI
     }
 }
 
-
+//Клас, у якому викконується інтерполяція
 class Interpolator
 {
+    //Метод, який інтерполює
     interpolate() {
         const method = document.getElementById('method').value;
         const pointInputMethod = document.getElementById('pointInputMethod').value;
         let points = [];
-    
+
         if (pointInputMethod === 'manual') {
             const numPoints = document.getElementById('pointsForm').children.length;
             if (numPoints < 2 || numPoints > 15) {
                 alert('Кількість точок повинна бути від 2 до 15.');
                 return;
             }
-    
+
             for (let i = 1; i <= numPoints; i++) {
                 const x = parseFloat(document.getElementById(`x${i}`).value);
                 const y = parseFloat(document.getElementById(`y${i}`).value);
@@ -281,15 +285,15 @@ class Interpolator
                 return;
             }
         }
-    
+
         points = awp.sortPoints(points);
-    
+
         const duplicates = awp.checkDuplicatePoints(points);
         if (duplicates.length > 0) {
             alert('Помилка! Знайдено однакові точки');
             return;
         }
-    
+
         if (method === 'cubic' || method === 'newton') {
             const xValues = points.map(p => p.x);
             const uniqueXValues = new Set(xValues);
@@ -298,10 +302,10 @@ class Interpolator
                 return;
             }
         }
-    
+
         let interpolatedPoints = [];
         let complexityCount = 0;
-    
+
         if (method === 'linear') {
             [interpolatedPoints, complexityCount] = this.linearInterpolation(points);
             this.displayLinearPolynomial(points);
@@ -310,24 +314,24 @@ class Interpolator
         } else if (method === 'newton') {
             [interpolatedPoints, complexityCount] = this.newtonInterpolation(points);
         }
-    
+
         awc.drawChart(points, interpolatedPoints);
         this.displayComplexity(method, points.length, complexityCount);
     }
-    
+    //Метод, який обраховує лінійну інтерполяцію
     linearInterpolation(points) {
         const interpolatedPoints = [];
         let complexityCount = 0;
-    
+
         for (let i = 0; i < points.length - 1; i++) {
             const x0 = points[i].x;
             const y0 = points[i].y;
             const x1 = points[i + 1].x;
             const y1 = points[i + 1].y;
             interpolatedPoints.push({ x: x0, y: y0 });
-    
+
             complexityCount += 1; // Push point
-    
+
             for (let x = x0 + 1; x < x1; x++) {
                 const y = y0 + (y1 - y0) * (x - x0) / (x1 - x0);
                 interpolatedPoints.push({ x, y });
@@ -336,12 +340,12 @@ class Interpolator
         }
         interpolatedPoints.push(points[points.length - 1]);
         complexityCount += 1; // Push last point
-    
+
         this.displayLinearPolynomial(points);
-    
+
         return [interpolatedPoints, complexityCount];
     }
-    
+    //Метод, який зображає поліном лінійної інтерполяції
     displayLinearPolynomial(points) {
         let polynomial = '';
         for (let i = 0; i < points.length - 1; i++) {
@@ -351,7 +355,7 @@ class Interpolator
             const y1 = points[i + 1].y;
             const slope = (y1 - y0) / (x1 - x0);
             const intercept = y0 - slope * x0;
-    
+
             polynomial += `L_{${i+1}}(x) = ${slope.toFixed(10)}x ${intercept >= 0 ? '+' : '-'} ${Math.abs(intercept.toFixed(10))}`;
             if (i < points.length - 2) {
                 polynomial += ';\n';
@@ -361,21 +365,21 @@ class Interpolator
         document.getElementById('polynomialDisplay').innerHTML = `\\[${polynomial}\\]`;
         MathJax.typeset(); // Assuming MathJax is loaded and configured
     }
-    
+    //Метод, який обраховує інтерполяцію методом Ньютона
     newtonInterpolation(points) {
         const n = points.length;
         const coefficients = this.dividedDifferences(points);
         const interpolatedPoints = [];
         let complexityCount = 0;
-    
+
         for (let x = points[0].x; x <= points[n - 1].x; x += 0.1) {
             let y = coefficients[0];
             complexityCount++; // Initialization
-    
+
             for (let i = 1; i < n; i++) {
                 let term = coefficients[i];
                 complexityCount++; // Initialization
-    
+
                 for (let j = 0; j < i; j++) {
                     term *= (x - points[j].x);
                     complexityCount += 2; // Multiplication and subtraction
@@ -385,37 +389,37 @@ class Interpolator
             }
             interpolatedPoints.push({ x, y });
         }
-    
+
         this.displayNewtonPolynomial(coefficients, points);
-    
+
         return [interpolatedPoints, complexityCount];
     }
-    
+    //Розраховує різницю для методу Ньютона
     dividedDifferences(points) {
         const n = points.length;
         const table = Array.from({ length: n }, () => Array(n).fill(0));
         let complexityCount = 0;
-    
+
         for (let i = 0; i < n; i++) {
             table[i][0] = points[i].y;
             complexityCount++; // Initialization
         }
-    
+
         for (let j = 1; j < n; j++) {
             for (let i = 0; i < n - j; i++) {
                 table[i][j] = (table[i + 1][j - 1] - table[i][j - 1]) / (points[i + j].x - points[i].x);
                 complexityCount += 3; // Subtraction, division, and assignment
             }
         }
-    
+
         return table[0];
     }
-    
+    //Метод, який зображає поліном інтерполяції методом Ньютона
     displayNewtonPolynomial(coefficients, points) {
         const n = coefficients.length;
-        let expandedPolynomial = Array(n).fill(0); // Array to hold the coefficients of the expanded polynomial
-    
-        // Function to multiply and add terms
+        let expandedPolynomial = Array(n).fill(0); // Масив для зберігання коефіцієнтів розгорнутого полінома
+
+        // Функція множення та додавання доданків
         const multiplyAndAdd = (termCoeffs, factor) => {
             const newCoeffs = Array(n).fill(0);
             for (let i = 0; i < termCoeffs.length; i++) {
@@ -429,10 +433,10 @@ class Interpolator
             }
             return newCoeffs;
         };
-    
-        // Initialize the expanded polynomial with the first coefficient
+
+        // Ініціалізація розширеного полінома з першим коефіцієнтом
         expandedPolynomial[0] = coefficients[0];
-    
+
         // Build the polynomial term by term
         for (let i = 1; i < n; i++) {
             let termCoeffs = Array(n).fill(0);
@@ -445,8 +449,8 @@ class Interpolator
             }
             expandedPolynomial = expandedPolynomial.map((val, idx) => val + termCoeffs[idx]);
         }
-    
-        // Format the polynomial for LaTeX
+
+        // Форматуємо поліном для LaTeX
         let polynomial = 'P(x) = ';
         let terms = [];
         for (let i = n - 1; i >= 0; i--) {
@@ -468,22 +472,21 @@ class Interpolator
             }
         }
         polynomial += terms.join('');
-    
+
         console.log(polynomial);
         document.getElementById('polynomialDisplay').innerHTML = `\\[${polynomial}\\]`;
-        MathJax.typeset(); // Assuming MathJax is loaded and configured
+        MathJax.typeset();
     }
-    
-    // Assuming MathJax is already included in your HTML file
-    
+    //Показує складність алгоритму
     displayComplexity(method, numPoints, complexityCount) {
         const complexityDisplay = document.getElementById('complexityDisplay');
         complexityDisplay.innerText = `Кількість точок: ${numPoints}, Кількість операцій: ${complexityCount}`;
     }
 }
-
+//Клас для роботи з графіком
 class actionWithChart
 {
+    //Метод, який зберігає графік
     saveChart() {
         const pointsForm = document.getElementById('pointsForm');
         if (pointsForm.children.length === 0) {
@@ -493,17 +496,17 @@ class actionWithChart
         const canvas = document.getElementById('interpolationChart');
         const link = document.createElement('a');
         link.href = canvas.toDataURL('image/png');
-        link.download = 'chart.png';
+        link.download = 'graphic.png';
         link.click();
-    }   
-
+    }
+    //Метод, який будує графік
     drawChart(originalPoints, interpolatedPoints) {
         const ctx = document.getElementById('interpolationChart').getContext('2d');
-    
+
         if (window.chart) {
             window.chart.destroy();
         }
-    
+
         window.chart = new Chart(ctx, {
             type: 'scatter',
             data: {
@@ -594,7 +597,7 @@ class actionWithChart
 
 }
 
-
+//Оголошення змінних
 const awp = new ActionWithPoints();
 const ui = new UI();
 const interp = new Interpolator();

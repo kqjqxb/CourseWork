@@ -33,11 +33,6 @@ button {
     font-size: 1.2em;
 }
 
-#remove
-{
-    /*border-width: 80%;*/
-}
-
 #polynomialDisplay {
     word-wrap: break-word;
     overflow-wrap: break-word;
